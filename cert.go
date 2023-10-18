@@ -250,6 +250,18 @@ func (c *Certificate) SetExpireDate(when time.Duration) error {
 	return nil
 }
 
+func (c *Certificate) GetExpireDate() (*time.Time, error) {
+	var buffer [20]C.char
+	ptr := &buffer[0]
+
+	C.X_X509_get_tmstr_notAfter(c.x, ptr)
+	t, err := time.Parse("2006-01-02 15:04:05", C.GoString(ptr))
+	if err != nil {
+		return nil, err
+	}
+	return &t, nil
+}
+
 // SetPubKey assigns a new public key to a certificate.
 func (c *Certificate) SetPubKey(pubKey PublicKey) error {
 	c.pubKey = pubKey
@@ -271,6 +283,13 @@ func (c *Certificate) Sign(privKey PrivateKey, digest EVP_MD) error {
 			"You're probably looking for 'EVP_SHA256' or 'EVP_SHA512'.")
 	}
 	return c.insecureSign(privKey, digest)
+}
+
+func (c *Certificate) Verify(publicKey PublicKey) error {
+	if C.X509_verify(c.x, publicKey.evpPKey()) <= 0 {
+		return errors.New("failed to verify certificate")
+	}
+	return nil
 }
 
 func (c *Certificate) insecureSign(privKey PrivateKey, digest EVP_MD) error {

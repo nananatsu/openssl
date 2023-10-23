@@ -23,12 +23,12 @@ package openssl
 #define X509_CHECK_FLAG_ALWAYS_CHECK_SUBJECT	0x1
 #define X509_CHECK_FLAG_NO_WILDCARDS	0x2
 
-extern int X509_check_host(X509 *x, const unsigned char *chk, size_t chklen,
-    unsigned int flags, char **peername);
-extern int X509_check_email(X509 *x, const unsigned char *chk, size_t chklen,
-    unsigned int flags);
+extern int X509_check_host(X509 *x, const char *chk, size_t chklen,
+                    unsigned int flags, char **peername);
+extern int X509_check_email(X509 *x, const char *chk, size_t chklen,
+                     unsigned int flags);
 extern int X509_check_ip(X509 *x, const unsigned char *chk, size_t chklen,
-		unsigned int flags);
+                  unsigned int flags);
 #endif
 */
 import "C"

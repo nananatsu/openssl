@@ -432,3 +432,19 @@ func (c *Certificate) SetVersion(version X509_Version) error {
 	}
 	return nil
 }
+
+func GetSerialNumberHex(serial *big.Int) (string, error) {
+	bn := C.BN_new()
+	defer C.BN_free(bn)
+
+	serialBytes := serial.Bytes()
+	if bn = C.BN_bin2bn((*C.uchar)(unsafe.Pointer(&serialBytes[0])), C.int(len(serialBytes)), bn); bn == nil {
+		return "", errors.New("failed to covert serial to bignum")
+	}
+
+	hex := C.BN_bn2hex(bn)
+	serialHex := C.GoString(hex)
+	C.X_OPENSSL_free(unsafe.Pointer(hex))
+
+	return serialHex, nil
+}
